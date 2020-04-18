@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,6 +16,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/user.css">
 </head>
+
 <body>
     <div class="page home-page">
         <!--*********************************************************************************************************-->
@@ -62,7 +64,8 @@
                             <a class="navbar-brand" href="">
                                 <h3>Gas Stations Locator</h3>
                             </a>
-                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"
+                                aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
                             <div class="collapse navbar-collapse" id="navbar">
@@ -71,8 +74,8 @@
                                     <li class="nav-item active">
                                         <a class="nav-link" href="#">Accueil</a>
                                     </li>
-                                 
-                                         
+
+
                                     <li class="nav-item">
                                         <a class="nav-link" href="">Contact</a>
                                     </li>
@@ -101,7 +104,8 @@
                             <div class="col-md-3 col-sm-3">
                                 <div class="form-group">
                                     <label for="Ville" class="col-form-label">Ville</label>
-                                    <input type="text" class="form-control" id="Ville" placeholder="La ville de recherche">
+                                    <input type="text" class="form-control" id="Ville"
+                                        placeholder="La ville de recherche">
                                 </div>
                                 <!--end form-group-->
                             </div>
@@ -117,27 +121,29 @@
                             <div class="col-md-3 col-sm-3">
                                 <div class="form-group">
                                     <label for="CodePostal" class="col-form-label">Code Postal</label>
-                                    <input type="text" class="form-control" id="CodePostal" placeholder="Le code postal">
+                                    <input type="text" class="form-control" id="CodePostal"
+                                        placeholder="Le code postal">
                                 </div>
                                 <!--end form-group-->
                             </div>
                             <!--end col-md-3-->
                             <div class="col-md-3 col-sm-3">
-                                <button type="submit" id="searchGas" class="btn btn-primary width-100">Rechercher</button>
+                                <button type="submit" id="searchGas"
+                                    class="btn btn-primary width-100">Rechercher</button>
                             </div>
                             <!--end col-md-3-->
                         </div>
                         <!--end form-row-->
                     </div>
                     <!--end main-search-form-->
-            
+
                 </div>
                 <!--end container-->
             </form>
             <!--============ End Hero Form ======================================================================-->
-                    </header>
+        </header>
         <!--end hero-->
-      
+
         <!--*********************************************************************************************************-->
         <!--************ FOOTER *************************************************************************************-->
         <!--*********************************************************************************************************-->
@@ -238,7 +244,8 @@
     <script src="lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
     <script type="text/javascript" src="assets/js/popper.min.js"></script>
     <script type="text/javascript" src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://maps.google.com/maps/api/js?v=3.exp&libraries=places,geometry&key=AIzaSyBn6_lZyqFFDxuySgH4kDSE3UonQGRD8Rc&language=fr&region=MA"></script>
+    <script type="text/javascript"
+        src="https://maps.google.com/maps/api/js?v=3.exp&libraries=places,geometry&key=AIzaSyBn6_lZyqFFDxuySgH4kDSE3UonQGRD8Rc&language=fr&region=MA"></script>
     <script src="assets/js/selectize.min.js"></script>
     <script src="assets/js/masonry.pkgd.min.js"></script>
     <script src="assets/js/icheck.min.js"></script>
@@ -359,130 +366,111 @@
                     return;
                 }
                 var boundsByCity = place.geometry.viewport;
-                console.log(boundsByCity);
                 var quartierAutoCompleteOptions = {
                     bounds: boundsByCity,
                     types: ['geocode'],
                     componentRestrictions: { country: "ma" }
                 };
-
-
                 var quartierInput = document.getElementById('Quartier');
                 var autocomplete = new google.maps.places.Autocomplete(quartierInput, {
                     bounds: boundsByCity,
                     strictBounds: true,
                 });
-
-              
             });
-
-
         }
-        $("#Ville").change(function () {
-        });
+
         $(function () {
             var kmRadius = 20;
+            var Circle = null;
             $("form").submit(function (e) {
                 e.preventDefault();
                 var city = $("#Ville").val();
                 var quartier = $("#Quartier").val();
                 var zipCode = $("#CodePostal").val();
-                if (city === "" || city === null) {
-
+                if ((city !== "" || city !== null) && (quartier === "" || quartier === null)) {
+                    GetAddress(city);
+                    console.log("d");
                 }
                 else if ((quartier !== "" || quartier !== null)) {
-                    var geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({ 'address': quartier }, function (results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {
-                            // Create the places service.
-                            var myLatlng = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
-                            var myOptions = {
-                                zoom: 12,
-                                center: myLatlng,
-                                mapTypeId: google.maps.MapTypeId.ROADMAP
-                            }
-                            var map = new google.maps.Map(document.getElementById("map-homepage"), myOptions);
-                            var service = new google.maps.places.PlacesService(map);
-
-
-                            // Perform a nearby search.
-                            service.nearbySearch(
-                                { location: myLatlng, radius: kmRadius * 500, type: ['gas_station'] },
-                                function (results, status, pagination) {
-                                    if (status !== 'OK') return;
-
-                                    createMarkers(results, map);
-
-                                });
-
-                        } else {
-                            alert("Something got wrong " + status);
-                        }
-                    });
+                    GetAddress(quartier);
+                    console.log("2");
                 }
                 else if (zipCode !== "" || zipCode !== null) {
-                    var geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({ 'address': zipCode }, function (results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {
-                            // Create the places service.
-                            var myLatlng = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
-                            var myOptions = {
-                                zoom: 12,
-                                center: myLatlng,
-                                mapTypeId: google.maps.MapTypeId.ROADMAP
-                            }
-                            var map = new google.maps.Map(document.getElementById("map-homepage"), myOptions);
-                            var service = new google.maps.places.PlacesService(map);
-
-
-                            // Perform a nearby search.
-                            service.nearbySearch(
-                                { location: myLatlng, radius: kmRadius * 500, type: ['gas_station'] },
-                                function (results, status, pagination) {
-                                    if (status !== 'OK') return;
-
-                                    createMarkers(results, map);
-
-                                });
-
-                        } else {
-                            alert("Something got wrong " + status);
-                        }
-                    });
-                }
-                else{
-                    var geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({ 'address': city + ', MA' }, function (results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {
-                            // Create the places service.
-                            var myLatlng = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
-                            var myOptions = {
-                                zoom: 11,
-                                center: myLatlng,
-                                mapTypeId: google.maps.MapTypeId.ROADMAP
-                            }
-                            var map = new google.maps.Map(document.getElementById("map-homepage"), myOptions);
-                            var service = new google.maps.places.PlacesService(map);
-
-
-                            // Perform a nearby search.
-                            service.nearbySearch(
-                                { location: myLatlng, radius: kmRadius * 1000, type: ['gas_station'] },
-                                function (results, status, pagination) {
-                                    if (status !== 'OK') return;
-
-                                    createMarkers(results, map);
-
-                                });
-
-                        } else {
-                            alert("Something got wrong " + status);
-                        }
-                    });
+                    GetAddress(zipCode);
                 }
 
             });
+            function GetAddress(address) {
+                var geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ 'address': address }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        // Create the places service.
+                        var myLatlng = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
+                        var myOptions = {
+                            zoom: 10,
+                            center: myLatlng,
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        }
+                        var map = new google.maps.Map(document.getElementById("map-homepage"), myOptions);
+                        var bounds = null;
+                        google.maps.event.addListenerOnce(map, 'idle', function () {
+                            bounds = this.getBounds();
+                          
+                            var service = new google.maps.places.PlacesService(map);
+                            var rad = GetBoundsRadius(bounds)/15;
+                            console.log('Rad => ' + rad);
+                            // Perform a nearby search.
+                            // radius *= 1609.344;
+                            service.nearbySearch(
+                                { location: myLatlng, radius: rad, type: ['gas_station'] },
+                                function (results, status, pagination) {
+                                    if (status !== 'OK') return;
+                                    createMarkers(results, map);
+                                    DrawCircle(map, myLatlng, rad);
+                                });
+                        });
 
+
+                    } else {
+                        alert("Something got wrong " + status);
+                    }
+                });
+            }
+           
+            function GetBoundsRadius(bounds) {
+                // r = radius of the earth in km
+                var r = 6378.8
+                // degrees to radians (divide by 57.2958)
+                var ne_lat = bounds.getNorthEast().lat() / 57.2958
+                var ne_lng = bounds.getNorthEast().lng() / 57.2958
+                var c_lat = bounds.getCenter().lat() / 57.2958
+                var c_lng = bounds.getCenter().lng() / 57.2958
+                // distance = circle radius from center to Northeast corner of bounds
+                var r_km = r * Math.acos(
+                    Math.sin(c_lat) * Math.sin(ne_lat) +
+                    Math.cos(c_lat) * Math.cos(ne_lat) * Math.cos(ne_lng - c_lng)
+                )
+                return r_km * 1000 // radius in meters
+            }
+            function DrawCircle(Map, Center, Radius) {
+
+                if (Circle != null) {
+                    Circle.setMap(null);
+                }
+
+                if (Radius > 0) {
+                    Circle = new google.maps.Circle({
+                        center: Center,
+                        radius: Radius,
+                        strokeColor: "#0000FF",
+                        strokeOpacity: 0.35,
+                        strokeWeight: 2,
+                        fillColor: "#0000FF",
+                        fillOpacity: 0.20,
+                        map: Map
+                    });
+                }
+            }
             function createMarkers(places, homeMap) {
                 var bounds = new google.maps.LatLngBounds();
 
@@ -508,17 +496,18 @@
                         strokeOpacity: 0.5,
                         fillColor: '#f0f0f0',
                         fillOpacity: 0.5,
-                        radius: kmRadius * 1000
+                        radius: kmRadius * 500
                     });
 
 
                     bounds.extend(place.geometry.location);
                 }
-                map.fitBounds(bounds);
+                homeMap.fitBounds(bounds);
             }
 
         });
     </script>
 
 </body>
+
 </html>
